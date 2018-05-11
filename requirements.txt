@@ -1,2 +1,8 @@
+attrs==18.1.0
+more-itertools==4.1.0
 peewee==3.3.4
+pluggy==0.6.0
+py==1.5.3
+pytest==3.5.1
 python-chess==0.23.5
+six==1.11.0
