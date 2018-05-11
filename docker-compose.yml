@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+    postgres:
+        image: postgres:9.6-alpine
+        ports:
+            - "5666:5432"
+        volumes:
+            - ~/chessdb/data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_USER: chessdb
+            POSTGRES_PASSWORD: secret
+        networks:
+            - chess_network
+networks:
+    chess_network:
+        driver: bridge
+
