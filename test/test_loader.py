@@ -7,7 +7,7 @@ test_pgn_path = os.path.join(curr_path, 'pgn_files/game_000.pgn')
 
 
 def test_loader(mocker):
-    mocker.patch('peewee.Model.save', new=MagicMock())
+    #mocker.patch('peewee.Model.save', new=MagicMock())
     loader = Loader()
     game = loader.load_single_file(test_pgn_path)
     assert game.headers['ECO'] == "D02"

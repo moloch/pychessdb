@@ -11,7 +11,7 @@ db = PostgresqlDatabase(
 
 
 class Game(Model):
-    id = BigAutoField(primary_key=True, unique=True)
+    id = PrimaryKeyField()
     event = CharField()
     site = CharField()
     date = CharField()
