@@ -26,9 +26,11 @@ class Loader:
             next_node = node.variations[0]
             fen = node.board().fen()
             hash_key = hashlib.md5(fen.encode()).hexdigest()
-            position_id = (Position.select().where(Position.hash == hash_key).execute())
-            if not position_id:
+            position_result = (Position.select().where(Position.hash == hash_key).execute())
+            if not position_result:
                 position_id = [x for x in (Position.insert(hash=hash_key).returning(Position.id)).execute()][0][0]
-            # TODO: insert position_game record
+            else:
+                position_id = position_result[0].id
+            PositionGame.insert(position_id=position_id, game_id=game_id).execute()
             node = next_node
         return game

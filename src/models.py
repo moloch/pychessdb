@@ -68,3 +68,4 @@ class PositionGame(BaseModel):
 
     class Meta:
         table_name = 'position_game'
+        primary_key = CompositeKey('position_id', 'game_id')
