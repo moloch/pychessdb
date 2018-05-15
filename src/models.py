@@ -10,7 +10,12 @@ db = PostgresqlDatabase(
 )
 
 
-class Game(Model):
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+
+class Game(BaseModel):
     id = PrimaryKeyField()
     event = CharField()
     site = CharField()
@@ -51,5 +56,15 @@ class Game(Model):
     ply_count = CharField()
     pgn = TextField()
 
+
+class Position(BaseModel):
+    id = PrimaryKeyField()
+    hash = FixedCharField(max_length=32)
+
+
+class PositionGame(BaseModel):
+    position_id = ForeignKeyField(Position)
+    game_id = ForeignKeyField(Game)
+
     class Meta:
-        database = db
+        table_name = 'position_game'

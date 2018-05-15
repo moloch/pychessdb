@@ -1,6 +1,6 @@
 import chess.pgn
 import hashlib
-from src.models import Game
+from src.models import Game, Position, PositionGame
 from src.pgn_tags import pgn_to_columns
 
 
@@ -21,12 +21,14 @@ class Loader:
         pgn_string = game.accept(exporter)
         game_headers = self._get_pgn_headers_columns(game.headers)
         game_id = [x for x in (Game.insert(pgn=pgn_string, **game_headers).returning(Game.id)).execute()][0][0]
-        print(game_id)
         node = game
         while not node.is_end():
             next_node = node.variations[0]
             fen = node.board().fen()
-            hash_key=hashlib.md5(fen.encode()).hexdigest()
-            #save FEN + game ID in dedicated table called positions
+            hash_key = hashlib.md5(fen.encode()).hexdigest()
+            position_id = (Position.select().where(Position.hash == hash_key).execute())
+            if not position_id:
+                position_id = [x for x in (Position.insert(hash=hash_key).returning(Position.id)).execute()][0][0]
+            # TODO: insert position_game record
             node = next_node
         return game

@@ -4,3 +4,5 @@
 
 appschema 2018-05-11T15:04:19Z root <root@linuxkit-025000000001> # Add schema for all chessdb objects.
 game 2018-05-11T15:10:11Z root <root@linuxkit-025000000001> # Add games table.
+position 2018-05-15T13:50:05Z root <root@linuxkit-025000000001> # Add schema for positions fast retrieval.
+position_game 2018-05-15T13:59:04Z root <root@linuxkit-025000000001> # Add link table between positions and games.
