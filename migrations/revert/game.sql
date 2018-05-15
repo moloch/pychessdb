@@ -2,6 +2,6 @@
 
 BEGIN;
 
-DROP TABLE games;
+DROP TABLE game;
 
 COMMIT;

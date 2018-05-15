@@ -3,4 +3,4 @@
 %uri=https://github.com/theory/sqitch-intro/
 
 appschema 2018-05-11T15:04:19Z root <root@linuxkit-025000000001> # Add schema for all chessdb objects.
-games 2018-05-11T15:10:11Z root <root@linuxkit-025000000001> # Add games table.
+game 2018-05-11T15:10:11Z root <root@linuxkit-025000000001> # Add games table.
