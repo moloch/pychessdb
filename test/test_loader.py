@@ -1,14 +1,12 @@
-from src.loader import Loader
+from src.loader import PGNLoader
 import os.path
 from unittest.mock import MagicMock
 
 curr_path = os.path.abspath(os.path.dirname(__file__))
-test_pgn_path = os.path.join(curr_path, 'pgn_files/game_000.pgn')
+test_pgn_path = os.path.join(curr_path, 'pgn_files/game_001.pgn')
 
 
 def test_loader(mocker):
     #mocker.patch('peewee.Model.save', new=MagicMock())
-    loader = Loader()
-    game = loader.load_single_file(test_pgn_path)
-    assert game.headers['ECO'] == "D02"
-    assert game.headers['Result'] == "1-0"
+    loader = PGNLoader()
+    game = loader.load(test_pgn_path)
