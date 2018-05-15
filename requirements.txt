@@ -17,11 +17,13 @@ psycopg2==2.7.4
 ptyprocess==0.5.2
 py==1.5.3
 Pygments==2.2.0
+PyQt5==5.10.1
 pytest==3.5.1
 pytest-mock==1.10.0
 python-chess==0.23.5
 python-decouple==3.1
 simplegeneric==0.8.1
+sip==4.19.8
 six==1.11.0
 traitlets==4.3.2
 wcwidth==0.1.7
