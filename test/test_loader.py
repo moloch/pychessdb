@@ -1,4 +1,4 @@
-from src.loader import PGNLoader
+from loader import PGNLoader
 import os.path
 from unittest.mock import MagicMock
 

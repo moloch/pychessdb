@@ -1,7 +1,7 @@
 import chess.pgn
 import hashlib
-from src.models import Game, Position, PositionGame
-from src.pgn_tags import pgn_to_columns
+from models import Game, Position, PositionGame
+from pgn_tags import pgn_to_columns
 
 
 class PGNLoader:
