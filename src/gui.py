@@ -37,27 +37,30 @@ class GamesTableModel(QAbstractTableModel):
         self.endResetModel()
 
 
+class GamesTableView(QTableView):
+    pass
+
+
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         layout = QVBoxLayout()
-        self.table_view = QTableView(self)
+        self.table_view = GamesTableView(self)
         self.table_view.setModel(GamesTableModel())
         self.table_view.horizontalHeader().setStretchLastSection(True)
+        self.table_view.setSortingEnabled(True)
 
         fixedfont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
         fixedfont.setPointSize(12)
         self.table_view.setFont(fixedfont)
 
-        self.path = None
-
         layout.addWidget(self.table_view)
 
         container = QWidget()
         container.setLayout(layout)
-        self.setCentralWidget(container)
+        self.setCentralWidget(container)  # Setting the central widget is very important.
 
         self.status = QStatusBar()
         self.setStatusBar(self.status)
@@ -85,12 +88,11 @@ class MainWindow(QMainWindow):
         dlg.show()
 
     def file_open(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Import games from PGN", "", "PGN files (*.pgn);All files (*.*)")
+        path, _ = QFileDialog.getOpenFileName(self, "Import games from PGN", filter='*.pgn')
 
         try:
             loader = PGNLoader()
             loader.load(path)
-            self.path = path
             self.update_title()
         except FileNotFoundError:
             pass
@@ -98,11 +100,12 @@ class MainWindow(QMainWindow):
     def load_database(self):
         games_model = self.table_view.model()
         games = Game.select().paginate(1, 10)
+        games_model.games = []
         for game in games:
             games_model.add_game(game)
 
     def update_title(self):
-        self.setWindowTitle("%s - PyChessDB" % (os.path.basename(self.path) if self.path else "Untitled"))
+        self.setWindowTitle("PyChessDB")
 
 
 if __name__ == '__main__':
