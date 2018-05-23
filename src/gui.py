@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         self.table_view = QTableView(self)
         self.table_view.setModel(GamesTableModel())
-        self.table_view.horizontalHeader().setStretchLastSection(QHeaderView.Stretch)
+        self.table_view.horizontalHeader().setStretchLastSection(True)
 
         fixedfont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
         fixedfont.setPointSize(12)
