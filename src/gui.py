@@ -2,20 +2,33 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from loader import PGNLoader
+from models import Game
 
 import os
 import sys
 
 
 class GamesTableModel(QAbstractTableModel):
+    def __init__(self):
+        super(GamesTableModel, self).__init__()
+        self.headers = {0: 'id', 1: 'white', 2: 'black', 3: 'pgn'}
+        self.games = []
+
     def rowCount(self, parent=None, *args, **kwargs):
-        return 10
+        return len(self.games)
 
     def columnCount(self, parent=None, *args, **kwargs):
-        return 12
+        return len(self.headers)
 
-    def data(self, QModelIndex, role=None):
-        return 'ciao'
+    def data(self, index, role=Qt.DisplayRole):
+        game = self.games[index.row()]
+        if role == Qt.DisplayRole:
+            return QVariant(getattr(game, self.headers[index.column()]))
+
+    def add_game(self, game):
+        self.beginResetModel()
+        self.games.append(game)
+        self.endResetModel()
 
 
 class MainWindow(QMainWindow):
@@ -53,6 +66,7 @@ class MainWindow(QMainWindow):
         open_db_action.triggered.connect(self.load_database)
 
         file_menu.addAction(open_file_action)
+        file_menu.addAction(open_db_action)
 
         self.update_title()
         self.show()
@@ -75,7 +89,10 @@ class MainWindow(QMainWindow):
             pass
 
     def load_database(self):
-        pass
+        games_model = self.table_view.model()
+        games = Game.select().paginate(1, 10)
+        for game in games:
+            games_model.add_game(game)
 
     def update_title(self):
         self.setWindowTitle("%s - PyChessDB" % (os.path.basename(self.path) if self.path else "Untitled"))
