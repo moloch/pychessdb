@@ -4,7 +4,6 @@ from PyQt5.QtCore import *
 from loader import PGNLoader
 from models import Game
 
-import os
 import sys
 
 
@@ -38,7 +37,10 @@ class GamesTableModel(QAbstractTableModel):
 
 
 class GamesTableView(QTableView):
-    pass
+    def selectionChanged(self, selected, deselected):
+        super(GamesTableView, self).selectionChanged(selected, deselected)
+        if len(selected.indexes()) > 2:
+            print(selected.indexes()[2].data())  # TODO load PGN inside editor
 
 
 class MainWindow(QMainWindow):
