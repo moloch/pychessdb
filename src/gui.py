@@ -28,6 +28,8 @@ class GamesTableModel(QAbstractTableModel):
     def headerData(self, index, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return QVariant(self.headers[index])
+        if role == Qt.DisplayRole and orientation == Qt.Vertical:
+            return QVariant(index)
 
     def add_game(self, game):
         self.beginResetModel()
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         self.table_view = QTableView(self)
         self.table_view.setModel(GamesTableModel())
+        self.table_view.horizontalHeader().setStretchLastSection(QHeaderView.Stretch)
 
         fixedfont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
         fixedfont.setPointSize(12)
