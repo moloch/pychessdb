@@ -11,7 +11,7 @@ import sys
 class GamesTableModel(QAbstractTableModel):
     def __init__(self):
         super(GamesTableModel, self).__init__()
-        self.headers = {0: 'id', 1: 'white', 2: 'black', 3: 'pgn'}
+        self.headers = {0: 'white', 1: 'black', 2: 'pgn'}
         self.games = []
 
     def rowCount(self, parent=None, *args, **kwargs):
@@ -24,6 +24,10 @@ class GamesTableModel(QAbstractTableModel):
         game = self.games[index.row()]
         if role == Qt.DisplayRole:
             return QVariant(getattr(game, self.headers[index.column()]))
+
+    def headerData(self, index, orientation, role=Qt.DisplayRole):
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            return QVariant(self.headers[index])
 
     def add_game(self, game):
         self.beginResetModel()
