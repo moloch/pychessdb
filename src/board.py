@@ -106,9 +106,9 @@ class PieceGraphics(QGraphicsPixmapItem):
     #     drag.exec_()
 
 
-class BoardWindow(QGraphicsView):
+class BoardGraphicsView(QGraphicsView):
     def __init__(self, game):
-        super(BoardWindow, self).__init__()
+        super(BoardGraphicsView, self).__init__()
         self.game = game
         scene = QGraphicsScene(self)
         rectangle = BoardGraphics(scene, game)
@@ -118,3 +118,21 @@ class BoardWindow(QGraphicsView):
         self.setScene(scene)
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setWindowTitle("Moloch Chess")
+
+
+class BoardMainWindow(QMainWindow):
+
+    def __init__(self, game):
+        super(BoardMainWindow, self).__init__()
+
+        self.game = game
+
+        layout = QHBoxLayout()
+        self.board_graphics_view = BoardGraphicsView(game)
+
+        layout.addWidget(self.board_graphics_view)
+
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+        self.show()

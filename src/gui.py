@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from board import BoardWindow
+from board import BoardMainWindow
 from loader import PGNLoader
 from models import Game
 
@@ -46,8 +46,10 @@ class GamesTableView(QTableView):
     def selectionChanged(self, selected, deselected):
         super(GamesTableView, self).selectionChanged(selected, deselected)
         if len(selected.indexes()) > 2:
-            self.parent().board_window = BoardWindow(game=chess.pgn.read_game(StringIO(selected.indexes()[2].data())))
-            self.parent().board_window.show()
+            self.parent().parent().board_window = BoardMainWindow(
+                game=chess.pgn.read_game(StringIO(selected.indexes()[2].data()))
+            )
+            self.parent().parent().board_window.show()
 
 
 class MainWindow(QMainWindow):
