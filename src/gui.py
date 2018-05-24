@@ -46,7 +46,7 @@ class GamesTableView(QTableView):
     def selectionChanged(self, selected, deselected):
         super(GamesTableView, self).selectionChanged(selected, deselected)
         if len(selected.indexes()) > 2:
-            self.parent().board_window = BoardWindow(board=chess.pgn.read_game(StringIO(selected.indexes()[2].data())))
+            self.parent().board_window = BoardWindow(game=chess.pgn.read_game(StringIO(selected.indexes()[2].data())))
             self.parent().board_window.show()
 
 
@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
 
     def load_database(self):
         games_model = self.table_view.model()
-        games = Game.select().paginate(1, 10)
+        games = Game.select().paginate(1, 50)
         games_model.games = []
         for game in games:
             games_model.add_game(game)

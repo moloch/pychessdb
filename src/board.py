@@ -38,35 +38,36 @@ class SquareGraphics(QGraphicsRectItem):
 
 
 class BoardGraphics(QGraphicsRectItem):
-    def __init__(self, scene, board):
+    def __init__(self, scene, game):
         super(BoardGraphics, self).__init__()
         self.scene = scene
-        self.board = board
+        self.game = game
         self.__generate_board()
         self.moving_piece = None
         self.current_move = None
 
     def __generate_board(self):
-        board = self.board
+        board = self.game.board()
         for square in chess.SQUARES:
             square_graphic_item = SquareGraphics(self, square)
-            x = chess.square_rank(square) * 70
-            y = chess.square_file(square) * 70
+            y = (70 * 7) - (chess.square_rank(square) * 70)
+            x = chess.square_file(square) * 70
             square_graphic_item.setRect(QRectF(x, y, 70, 70))
             if (square + chess.square_rank(square)) % 2 == 0:
-                square_graphic_item.setBrush(QBrush(QColor("white")))
-            else:
                 square_graphic_item.setBrush(QBrush(QColor("grey")))
+            else:
+                square_graphic_item.setBrush(QBrush(QColor("white")))
             self.scene.addItem(square_graphic_item)
-            # self.__add_piece(square.piece, x, y)
+            self.__add_piece(board.piece_at(square), x, y)
 
-    #def __add_piece(self, piece, x, y):
-    #    if piece is not None:
-    #        piece_pixmap = QPixmap("img/" + piece.color + "_" + piece.name + ".png")
-    #        piece_pixmap = piece_pixmap.scaledToHeight(70, Qt.SmoothTransformation)
-    #        piece_graphics = PieceGraphics(self, piece_pixmap, piece)
-    #        piece_graphics.setOffset(x, y)
-    #        self.scene.addItem(piece_graphics)
+    def __add_piece(self, piece, x, y):
+        if piece is not None:
+            color_symbol = 'w' if chess.WHITE == piece.color else 'b'
+            piece_pixmap = QPixmap("images/" + color_symbol + "_" + piece.symbol().lower() + ".png")
+            piece_pixmap = piece_pixmap.scaledToHeight(70, Qt.SmoothTransformation)
+            piece_graphics = PieceGraphics(self, piece_pixmap, piece)
+            piece_graphics.setOffset(x, y)
+            self.scene.addItem(piece_graphics)
 
 
 class PieceGraphics(QGraphicsPixmapItem):
@@ -106,11 +107,11 @@ class PieceGraphics(QGraphicsPixmapItem):
 
 
 class BoardWindow(QGraphicsView):
-    def __init__(self, board):
+    def __init__(self, game):
         super(BoardWindow, self).__init__()
-        self.board = board
+        self.game = game
         scene = QGraphicsScene(self)
-        rectangle = BoardGraphics(scene, board)
+        rectangle = BoardGraphics(scene, game)
         rectangle.setRect(QRectF(0, 0, 560, 560))
         scene.addItem(rectangle)
         scene.setSceneRect(0, 0, 560, 560)
