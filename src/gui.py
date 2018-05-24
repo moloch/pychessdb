@@ -46,8 +46,9 @@ class GamesTableView(QTableView):
     def selectionChanged(self, selected, deselected):
         super(GamesTableView, self).selectionChanged(selected, deselected)
         if len(selected.indexes()) > 2:
-            self.parent().board_window = BoardWindow(game=chess.pgn.read_game(StringIO(selected.indexes()[2].data())))
-            self.parent().board_window.show()
+            self.parent().parent().replace_chessboard(
+                BoardWindow(game=chess.pgn.read_game(StringIO(selected.indexes()[2].data())))
+            )
 
 
 class MainWindow(QMainWindow):
@@ -55,8 +56,8 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        layout = QVBoxLayout()
-        self.table_view = GamesTableView(self)
+        self.boxlayout = QHBoxLayout()
+        self.table_view = GamesTableView(parent=self)
         self.table_view.setModel(GamesTableModel())
         self.table_view.horizontalHeader().setStretchLastSection(True)
         self.table_view.setSortingEnabled(True)
@@ -65,10 +66,13 @@ class MainWindow(QMainWindow):
         fixedfont.setPointSize(12)
         self.table_view.setFont(fixedfont)
 
-        layout.addWidget(self.table_view)
+        self.board_window = QWidget()
+
+        self.boxlayout.addWidget(self.table_view)
+        self.boxlayout.addWidget(self.board_window)
 
         container = QWidget()
-        container.setLayout(layout)
+        container.setLayout(self.boxlayout)
         self.setCentralWidget(container)  # Setting the central widget is very important.
 
         self.status = QStatusBar()
@@ -112,6 +116,11 @@ class MainWindow(QMainWindow):
         games_model.games = []
         for game in games:
             games_model.add_game(game)
+
+    def replace_chessboard(self, new_chessboard):
+        self.board_window.hide()
+        self.boxlayout.replaceWidget(self.board_window, new_chessboard)
+        self.board_window = new_chessboard
 
     def update_title(self):
         self.setWindowTitle("PyChessDB")
