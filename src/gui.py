@@ -98,6 +98,7 @@ class MainWindow(QMainWindow):
                 Qt.LeftToRight, Qt.AlignCenter, self.size(), desktop
             )
         )
+        self.load_database()
         self.show()
 
     def dialog_critical(self, s):
