@@ -90,6 +90,14 @@ class MainWindow(QMainWindow):
         file_menu.addAction(open_db_action)
 
         self.update_title()
+        desktop = QDesktopWidget().availableGeometry(self)
+        desktop_size = desktop.size()
+        self.resize(desktop_size.width() * 0.5, desktop_size.height() * 0.5)
+        self.setGeometry(
+            QStyle.alignedRect(
+                Qt.LeftToRight, Qt.AlignCenter, self.size(), desktop
+            )
+        )
         self.show()
 
     def dialog_critical(self, s):
