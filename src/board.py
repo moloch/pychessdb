@@ -140,7 +140,6 @@ class BoardGraphicsView(QGraphicsView):
     def update_board(self, board):
         self.board_graphics.remove_all_pieces()
         self.board_graphics.add_all_pieces(board)
-        #self.viewport().update()
 
 
 class BoardMainWindow(QMainWindow):
