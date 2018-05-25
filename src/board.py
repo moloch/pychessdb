@@ -41,16 +41,16 @@ class SquareGraphics(QGraphicsRectItem):
 
 
 class BoardGraphics(QGraphicsRectItem):
-    def __init__(self, scene, game):
+    def __init__(self, scene, board):
         super(BoardGraphics, self).__init__()
         self.scene = scene
-        self.game = game
+        self.board = board
         self.__generate_board()
         self.moving_piece = None
         self.current_move = None
 
     def __generate_board(self):
-        board = self.game.board()
+        board = self.board
         for square in chess.SQUARES:
             square_graphic_item = SquareGraphics(self, square)
             y = (70 * 7) - (chess.square_rank(square) * 70)
@@ -110,11 +110,11 @@ class PieceGraphics(QGraphicsPixmapItem):
 
 
 class BoardGraphicsView(QGraphicsView):
-    def __init__(self, game):
+    def __init__(self, board):
         super(BoardGraphicsView, self).__init__()
-        self.game = game
+        self.board = board
         scene = QGraphicsScene(self)
-        rectangle = BoardGraphics(scene, game)
+        rectangle = BoardGraphics(scene, self.board)
         rectangle.setRect(QRectF(0, 0, 560, 560))
         scene.addItem(rectangle)
         scene.setSceneRect(0, 0, 560, 560)
@@ -130,19 +130,33 @@ class BoardMainWindow(QMainWindow):
 
         self.game = game
 
-        layout = QHBoxLayout()
-        self.board_graphics_view = BoardGraphicsView(game)
-        self.pgn_editor = QTextEdit(self)
+        self.layout = QHBoxLayout()
+        self.board_graphics_view = BoardGraphicsView(self.game.board().copy())
+        self.pgn_editor = QTextBrowser(self)
+        self.pgn_editor.anchorClicked.connect(self.on_anchor_clicked)
         pgn_exporter = HtmlExporter(headers=False, comments=False)
         self.pgn_editor.setAcceptRichText(True)
         game_text = game.accept(pgn_exporter)
         print(game_text)
+        self.pgn_editor.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.pgn_editor.setHtml(game_text)
 
-        layout.addWidget(self.board_graphics_view)
-        layout.addWidget(self.pgn_editor)
+        self.layout.addWidget(self.board_graphics_view)
+        self.layout.addWidget(self.pgn_editor)
 
         container = QWidget()
-        container.setLayout(layout)
+        container.setLayout(self.layout)
         self.setCentralWidget(container)
         self.show()
+
+    def on_anchor_clicked(self, url):
+        self.pgn_editor.setSource(QUrl())
+        query_params = QUrlQuery(url)
+        fen = query_params.queryItemValue('fen')
+        move = query_params.queryItemValue('move')
+        new_board = chess.Board(fen=fen)
+        new_board.push(chess.Move.from_uci(move))
+        self.board_graphics_view.hide()
+        board_view = BoardGraphicsView(new_board)
+        self.layout.replaceWidget(self.board_graphics_view, board_view)
+        self.board_graphics_view = board_view
