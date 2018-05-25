@@ -43,14 +43,15 @@ class SquareGraphics(QGraphicsRectItem):
 class BoardGraphics(QGraphicsRectItem):
     def __init__(self, scene, board):
         super(BoardGraphics, self).__init__()
+        self.piece_graphics = []
         self.scene = scene
         self.board = board
         self.__generate_board()
+        self.add_all_pieces(board)
         self.moving_piece = None
         self.current_move = None
 
     def __generate_board(self):
-        board = self.board
         for square in chess.SQUARES:
             square_graphic_item = SquareGraphics(self, square)
             y = (70 * 7) - (chess.square_rank(square) * 70)
@@ -61,6 +62,11 @@ class BoardGraphics(QGraphicsRectItem):
             else:
                 square_graphic_item.setBrush(QBrush(QColor("white")))
             self.scene.addItem(square_graphic_item)
+
+    def add_all_pieces(self, board):
+        for square in chess.SQUARES:
+            y = (70 * 7) - (chess.square_rank(square) * 70)
+            x = chess.square_file(square) * 70
             self.__add_piece(board.piece_at(square), x, y)
 
     def __add_piece(self, piece, x, y):
@@ -70,7 +76,13 @@ class BoardGraphics(QGraphicsRectItem):
             piece_pixmap = piece_pixmap.scaledToHeight(70, Qt.SmoothTransformation)
             piece_graphics = PieceGraphics(self, piece_pixmap, piece)
             piece_graphics.setOffset(x, y)
+            self.piece_graphics.append(piece_graphics)
             self.scene.addItem(piece_graphics)
+
+    def remove_all_pieces(self):
+        for p in self.piece_graphics:
+            self.scene.removeItem(p)
+        self.piece_graphics = []
 
 
 class PieceGraphics(QGraphicsPixmapItem):
@@ -112,15 +124,23 @@ class PieceGraphics(QGraphicsPixmapItem):
 class BoardGraphicsView(QGraphicsView):
     def __init__(self, board):
         super(BoardGraphicsView, self).__init__()
+
         self.board = board
-        scene = QGraphicsScene(self)
-        rectangle = BoardGraphics(scene, self.board)
-        rectangle.setRect(QRectF(0, 0, 560, 560))
-        scene.addItem(rectangle)
-        scene.setSceneRect(0, 0, 560, 560)
-        self.setScene(scene)
+        self.scene = QGraphicsScene(self)
+        self.board_graphics = BoardGraphics(self.scene, self.board)
+        self.board_graphics.setRect(QRectF(0, 0, 560, 560))
+        self.scene.addItem(self.board_graphics)
+
+        self.board_graphics = self.board_graphics
+        self.scene.setSceneRect(0, 0, 560, 560)
+        self.setScene(self.scene)
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setWindowTitle("Moloch Chess")
+
+    def update_board(self, board):
+        self.board_graphics.remove_all_pieces()
+        self.board_graphics.add_all_pieces(board)
+        #self.viewport().update()
 
 
 class BoardMainWindow(QMainWindow):
@@ -132,12 +152,14 @@ class BoardMainWindow(QMainWindow):
 
         self.layout = QHBoxLayout()
         self.board_graphics_view = BoardGraphicsView(self.game.board().copy())
+        sp_retain = self.board_graphics_view.sizePolicy()
+        sp_retain.setRetainSizeWhenHidden(True)
+        self.board_graphics_view.setSizePolicy(sp_retain)
         self.pgn_editor = QTextBrowser(self)
         self.pgn_editor.anchorClicked.connect(self.on_anchor_clicked)
         pgn_exporter = HtmlExporter(headers=False, comments=False)
         self.pgn_editor.setAcceptRichText(True)
         game_text = game.accept(pgn_exporter)
-        print(game_text)
         self.pgn_editor.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.pgn_editor.setHtml(game_text)
 
@@ -156,7 +178,4 @@ class BoardMainWindow(QMainWindow):
         move = query_params.queryItemValue('move')
         new_board = chess.Board(fen=fen)
         new_board.push(chess.Move.from_uci(move))
-        self.board_graphics_view.hide()
-        board_view = BoardGraphicsView(new_board)
-        self.layout.replaceWidget(self.board_graphics_view, board_view)
-        self.board_graphics_view = board_view
+        self.board_graphics_view.update_board(new_board)
