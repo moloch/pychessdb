@@ -5,6 +5,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import chess
+import chess.pgn
+
+from exporter import HtmlExporter
 
 
 class SquareGraphics(QGraphicsRectItem):
@@ -129,8 +132,15 @@ class BoardMainWindow(QMainWindow):
 
         layout = QHBoxLayout()
         self.board_graphics_view = BoardGraphicsView(game)
+        self.pgn_editor = QTextEdit(self)
+        pgn_exporter = HtmlExporter(headers=False, comments=False)
+        self.pgn_editor.setAcceptRichText(True)
+        game_text = game.accept(pgn_exporter)
+        print(game_text)
+        self.pgn_editor.setHtml(game_text)
 
         layout.addWidget(self.board_graphics_view)
+        layout.addWidget(self.pgn_editor)
 
         container = QWidget()
         container.setLayout(layout)
