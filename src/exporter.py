@@ -5,6 +5,23 @@ from chess.pgn import StringExporter
 
 class HtmlExporter(StringExporter):
 
+    def begin_variation(self):
+        self.variation_depth += 1
+
+        if self.variations:
+            self.write_token('<br>')
+            self.write_token('&nbsp;' * self.variation_depth * 4)
+            self.write_token('( ')
+            self.force_movenumber = True
+
+    def end_variation(self):
+        self.variation_depth -= 1
+
+        if self.variations:
+            self.write_token(') <br>')
+            self.write_token('&nbsp;' * self.variation_depth * 4)
+            self.force_movenumber = True
+
     def visit_move(self, board, move):
         if self.variations or not self.variation_depth:
             # Write the move number.
