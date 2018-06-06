@@ -29,7 +29,9 @@ class HtmlExporter(StringExporter):
                 self.write_token(str(board.fullmove_number) + ". ")
             elif self.force_movenumber:
                 self.write_token(str(board.fullmove_number) + "... ")
-            self.write_token('<a href="/move/?fen={}&move={}">'.format(board.fen(), move.uci()))
+            new_board = board.copy()
+            new_board.push(move)
+            self.write_token('<a href="/move/?fen={}&move={}">'.format(new_board.fen(), move.uci()))
             # Write the SAN.
             self.write_token(board.san(move) + "</a> ")
 

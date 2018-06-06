@@ -10,6 +10,14 @@ import chess.pgn
 from exporter import HtmlExporter
 
 
+def search_position(variations, fen):
+    for v in variations:
+        if v.board().fen() == fen:
+            return v
+        else:
+            return search_position(v.variations, fen)
+
+
 class SquareGraphics(QGraphicsRectItem):
     def __init__(self, board_graphics, square):
         super(SquareGraphics, self).__init__()
@@ -175,6 +183,5 @@ class BoardMainWindow(QMainWindow):
         query_params = QUrlQuery(url)
         fen = query_params.queryItemValue('fen')
         move = query_params.queryItemValue('move')
-        new_board = chess.Board(fen=fen)
-        new_board.push(chess.Move.from_uci(move))
-        self.board_graphics_view.update_board(new_board)
+        found = search_position(self.game.variations, fen)
+        self.board_graphics_view.update_board(found.board())
