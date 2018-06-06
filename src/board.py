@@ -10,13 +10,18 @@ import chess.pgn
 from exporter import HtmlExporter
 
 
-def search_position(variations, fen):
-    for v in variations:
-        if v.board().fen() == fen:
-            return v
-        else:
-            return search_position(v.variations, fen)
+def recursiveChildren(node):
+    results = [node]
+    for v in node.variations:
+        results.extend(recursiveChildren(v))
+    return results
 
+
+def search_position(game, fen):
+    nodes = recursiveChildren(game)
+    for n in nodes:
+        if n.board().fen() == fen:
+            return n
 
 class SquareGraphics(QGraphicsRectItem):
     def __init__(self, board_graphics, square):
@@ -183,5 +188,5 @@ class BoardMainWindow(QMainWindow):
         query_params = QUrlQuery(url)
         fen = query_params.queryItemValue('fen')
         move = query_params.queryItemValue('move')
-        found = search_position(self.game.variations, fen)
+        found = search_position(self.game, fen)
         self.board_graphics_view.update_board(found.board())
