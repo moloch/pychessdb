@@ -10,18 +10,19 @@ import chess.pgn
 from exporter import HtmlExporter
 
 
-def recursiveChildren(node):
+def recursive_children(node):
     results = [node]
     for v in node.variations:
-        results.extend(recursiveChildren(v))
+        results.extend(recursive_children(v))
     return results
 
 
 def search_position(game, fen):
-    nodes = recursiveChildren(game)
+    nodes = recursive_children(game)
     for n in nodes:
         if n.board().fen() == fen:
             return n
+
 
 class SquareGraphics(QGraphicsRectItem):
     def __init__(self, board_graphics, square):
